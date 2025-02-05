@@ -1,6 +1,5 @@
-import fastify from "fastify";
-
-const app = fastify();
+import { env } from "./env";
+import { app } from "./app";
 
 app.get("/hello", () => {
   return "Hello World";
@@ -8,6 +7,7 @@ app.get("/hello", () => {
 
 app
   .listen({
-    port: 3333,
+    host: "0.0.0.0",
+    port: env.PORT,
   })
   .then(() => console.log("HTTP is running!"));
