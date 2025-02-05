@@ -2,10 +2,9 @@ import { env } from "./env";
 import { app } from "./app";
 import { knex } from "./database";
 
-app.get("/hello", async () => {
-  const tables = await knex("sqlite_schema").select("*");
-
-  return tables;
+app.setErrorHandler((error, request, reply) => {
+  console.error(error);
+  reply.status(500).send({ error: "Internal Server Error" });
 });
 
 app
