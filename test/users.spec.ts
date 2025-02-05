@@ -47,4 +47,26 @@ describe("User routes", () => {
       })
       .expect(400);
   });
+
+  it("should not be able to create a user with empty name", async () => {
+    await request(app.server)
+      .post("/users")
+      .send({
+        name: "",
+        email: "fulano@example.com",
+        password: "123",
+      })
+      .expect(400);
+  });
+
+  it("should not be able to create a user with empty password", async () => {
+    await request(app.server)
+      .post("/users")
+      .send({
+        name: "Fulano",
+        email: "fulano@example.com",
+        password: "",
+      })
+      .expect(400);
+  });
 });
