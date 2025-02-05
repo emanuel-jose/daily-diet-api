@@ -1,8 +1,11 @@
 import { env } from "./env";
 import { app } from "./app";
+import { knex } from "./database";
 
-app.get("/hello", () => {
-  return "Hello World";
+app.get("/hello", async () => {
+  const tables = await knex("sqlite_schema").select("*");
+
+  return tables;
 });
 
 app
