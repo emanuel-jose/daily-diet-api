@@ -17,6 +17,7 @@ export const config: Knex.Config = {
   migrations: {
     extension: "ts",
     directory: "./db/migrations",
+    disableTransactions: false,
   },
 };
 

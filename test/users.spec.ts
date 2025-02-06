@@ -9,6 +9,7 @@ describe("User routes", () => {
   });
 
   afterAll(async () => {
+    execSync("npm run knex migrate:rollback --all");
     await app.close();
   });
 
