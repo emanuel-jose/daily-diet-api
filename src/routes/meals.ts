@@ -47,4 +47,20 @@ export async function mealsRoutes(app: FastifyInstance) {
       }
     }
   });
+
+  app.get("/", async (request, reply) => {
+    const { token } = request.cookies;
+    const userId = app.jwt.verify<{ userId: string }>(token as string).userId;
+
+    const meals = (await knex("meals").where("user_id", userId).select()).map(
+      (meal) => ({
+        ...meal,
+        is_within_diet: isNaN(Number(meal.is_within_diet))
+          ? meal.is_within_diet
+          : Number(meal.is_within_diet) === 1,
+      })
+    );
+
+    return { meals };
+  });
 }

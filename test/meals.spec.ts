@@ -38,4 +38,38 @@ describe("Meals Routes", () => {
       })
       .expect(201);
   });
+
+  it("should be able to list all meals", async () => {
+    const newUser = await request(app.server).post("/users").send({
+      name: "Fulano",
+      email: "fulano@example.com",
+      password: "123",
+    });
+
+    const cookies = newUser.get("Set-Cookie");
+
+    await request(app.server)
+      .post("/meals")
+      .set("Cookie", cookies as string[])
+      .send({
+        name: "Pipoca",
+        description: "Comi dormindo",
+        datetime: "2023-04-05",
+        isWithinDiet: true,
+      });
+
+    const listOfMeals = await request(app.server)
+      .get("/meals")
+      .set("Cookie", cookies as string[])
+      .expect(200);
+
+    expect(listOfMeals.body.meals).toEqual([
+      expect.objectContaining({
+        name: "Pipoca",
+        description: "Comi dormindo",
+        datetime: "2023-04-05",
+        is_within_diet: true,
+      }),
+    ]);
+  });
 });
