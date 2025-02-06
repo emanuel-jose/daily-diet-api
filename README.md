@@ -12,12 +12,12 @@
 - [x] Deve ser possível apagar uma refeição
 - [x] Deve ser possível listar todas as refeições de um usuário
 - [x] Deve ser possível visualizar uma única refeição
-- [ ] Deve ser possível recuperar as métricas de um usuário
-  - [ ] Quantidade total de refeições registradas
-  - [ ] Quantidade total de refeições dentro da dieta
-  - [ ] Quantidade total de refeições fora da dieta
-  - [ ] Melhor sequência de refeições dentro da dieta
-- [ ] O usuário só pode visualizar, editar e apagar as refeições o qual ele criou
+- [x] Deve ser possível recuperar as métricas de um usuário
+  - [x] Quantidade total de refeições registradas
+  - [x] Quantidade total de refeições dentro da dieta
+  - [x] Quantidade total de refeições fora da dieta
+  - [x] Melhor sequência de refeições dentro da dieta
+- [x] O usuário só pode visualizar, editar e apagar as refeições o qual ele criou
 
 ### Rotas:
 
@@ -43,7 +43,7 @@
   }
   ```
 
-- [POST]/login (Logar com um usuário existente):
+- New TODO: [POST]/login (Logar com um usuário existente):
   Loga na aplicação com um usuário exsitente no banco e guarda um token nos cookies assim como a rota de criação.
   Request:
 
@@ -62,7 +62,7 @@ Response:
 }
 ```
 
-- [POST]/logout (Deslogar da aplicação):
+- New TODO: [POST]/logout (Deslogar da aplicação):
   Desloga o usuário atual da sessão, removendo o token dos cookies
 
   Response:

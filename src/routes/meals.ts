@@ -152,14 +152,16 @@ export async function mealsRoutes(app: FastifyInstance) {
           isWithinDiet !== undefined
             ? isWithinDiet
             : currentMeal.is_within_diet;
-        const updateDate =
+        const updateDateTime =
           datetime.trim() !== "" ? datetime : currentMeal.datetime;
+        const updatAt = new Date();
 
         await knex("meals").where({ user_id: userId, id }).update({
           name: updatedName,
           description: updatedDescription,
           is_within_diet: updatedIsWithinDiet,
-          datetime: updateDate,
+          datetime: updateDateTime,
+          update_at: updatAt.toISOString(),
         });
       } else {
         return reply.status(400).send({ message: "Meal not exists!" });
