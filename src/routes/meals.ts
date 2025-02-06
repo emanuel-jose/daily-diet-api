@@ -121,5 +121,60 @@ export async function mealsRoutes(app: FastifyInstance) {
     }
   });
 
-  app.put("/:id", async (request, reply) => {});
+  app.put("/:id", async (request, reply) => {
+    const getMealParamsSchema = z.object({
+      id: z.string().uuid(),
+    });
+
+    const editMealBodySchema = z.object({
+      name: z.string(),
+      description: z.string(),
+      datetime: z.string(),
+      isWithinDiet: z.boolean(),
+    });
+
+    try {
+      const { id } = getMealParamsSchema.parse(request.params);
+      const { token } = request.cookies;
+      const userId = app.jwt.verify<{ userId: string }>(token as string).userId;
+      const { name, description, datetime, isWithinDiet } =
+        editMealBodySchema.parse(request.body);
+
+      const currentMeal = await knex("meals")
+        .where({ user_id: userId, id })
+        .first();
+
+      if (currentMeal) {
+        const updatedName = name.trim() !== "" ? name : currentMeal.name;
+        const updatedDescription =
+          description.trim() !== "" ? description : currentMeal.description;
+        const updatedIsWithinDiet =
+          isWithinDiet !== undefined
+            ? isWithinDiet
+            : currentMeal.is_within_diet;
+        const updateDate =
+          datetime.trim() !== "" ? datetime : currentMeal.datetime;
+
+        await knex("meals").where({ user_id: userId, id }).update({
+          name: updatedName,
+          description: updatedDescription,
+          is_within_diet: updatedIsWithinDiet,
+          datetime: updateDate,
+        });
+      } else {
+        return reply.status(400).send({ message: "Meal not exists!" });
+      }
+
+      reply.status(204);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const formattedErrors = error.issues.map((issue) => ({
+          path: issue.path.join("."),
+          message: issue.message,
+        }));
+
+        reply.status(400).send({ errors: formattedErrors });
+      }
+    }
+  });
 }
