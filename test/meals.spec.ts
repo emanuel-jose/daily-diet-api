@@ -72,4 +72,73 @@ describe("Meals Routes", () => {
       }),
     ]);
   });
+
+  it("should be able to list specif meal", async () => {
+    const newUser = await request(app.server).post("/users").send({
+      name: "Fulano",
+      email: "fulano@example.com",
+      password: "123",
+    });
+
+    const cookies = newUser.get("Set-Cookie");
+
+    const newMeal = await request(app.server)
+      .post("/meals")
+      .set("Cookie", cookies as string[])
+      .send({
+        name: "Pipoca",
+        description: "Comi dormindo",
+        datetime: "2023-04-05",
+        isWithinDiet: true,
+      });
+
+    const mealId = newMeal.body.meal.id;
+
+    const getSpecifiMealById = await request(app.server)
+      .get(`/meals/${mealId}`)
+      .set("Cookie", cookies as string[])
+      .expect(200);
+
+    expect(getSpecifiMealById.body.meal).toEqual(
+      expect.objectContaining({
+        name: "Pipoca",
+        description: "Comi dormindo",
+        datetime: "2023-04-05",
+        is_within_diet: true,
+      })
+    );
+  });
+
+  it("should be able to delete a specific meal", async () => {
+    const newUser = await request(app.server).post("/users").send({
+      name: "Fulano",
+      email: "fulano@example.com",
+      password: "123",
+    });
+
+    const cookies = newUser.get("Set-Cookie");
+
+    const newMeal = await request(app.server)
+      .post("/meals")
+      .set("Cookie", cookies as string[])
+      .send({
+        name: "Pipoca",
+        description: "Comi dormindo",
+        datetime: "2023-04-05",
+        isWithinDiet: true,
+      });
+
+    const mealId = newMeal.body.meal.id;
+
+    await request(app.server)
+      .delete(`/meals/${mealId}`)
+      .set("Cookie", cookies as string[])
+      .expect(204);
+
+    const listOfMeals = await request(app.server)
+      .get("/meals")
+      .set("Cookie", cookies as string[]);
+
+    expect(listOfMeals.body.meals).toEqual([]);
+  });
 });

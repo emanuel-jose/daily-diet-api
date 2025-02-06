@@ -48,7 +48,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     }
   });
 
-  app.get("/", async (request, reply) => {
+  app.get("/", async (request) => {
     const { token } = request.cookies;
     const userId = app.jwt.verify<{ userId: string }>(token as string).userId;
 
@@ -63,4 +63,63 @@ export async function mealsRoutes(app: FastifyInstance) {
 
     return { meals };
   });
+
+  app.get("/:id", async (request, reply) => {
+    const getMealParamsSchema = z.object({
+      id: z.string().uuid(),
+    });
+
+    try {
+      const { id } = getMealParamsSchema.parse(request.params);
+      const { token } = request.cookies;
+      const userId = app.jwt.verify<{ userId: string }>(token as string).userId;
+
+      const meal = await knex("meals").where({ user_id: userId, id }).first();
+
+      const formattedMeal = {
+        ...meal,
+        is_within_diet: isNaN(Number(meal?.is_within_diet))
+          ? meal?.is_within_diet
+          : Number(meal?.is_within_diet) === 1,
+      };
+
+      return { meal: formattedMeal };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const formattedErrors = error.issues.map((issue) => ({
+          path: issue.path.join("."),
+          message: issue.message,
+        }));
+
+        reply.status(400).send({ errors: formattedErrors });
+      }
+    }
+  });
+
+  app.delete("/:id", async (request, reply) => {
+    const getMealParamsSchema = z.object({
+      id: z.string().uuid(),
+    });
+
+    try {
+      const { id } = getMealParamsSchema.parse(request.params);
+      const { token } = request.cookies;
+      const userId = app.jwt.verify<{ userId: string }>(token as string).userId;
+
+      await knex("meals").where({ user_id: userId, id }).delete();
+
+      reply.status(204);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const formattedErrors = error.issues.map((issue) => ({
+          path: issue.path.join("."),
+          message: issue.message,
+        }));
+
+        reply.status(400).send({ errors: formattedErrors });
+      }
+    }
+  });
+
+  app.put("/:id", async (request, reply) => {});
 }
