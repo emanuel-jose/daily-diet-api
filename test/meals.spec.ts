@@ -141,4 +141,50 @@ describe("Meals Routes", () => {
 
     expect(listOfMeals.body.meals).toEqual([]);
   });
+
+  it("should be able to edit a specifc  meal", async () => {
+    const newUser = await request(app.server).post("/users").send({
+      name: "Fulano",
+      email: "fulano@example.com",
+      password: "123",
+    });
+
+    const cookies = newUser.get("Set-Cookie");
+
+    const newMeal = await request(app.server)
+      .post("/meals")
+      .set("Cookie", cookies as string[])
+      .send({
+        name: "Pipoca",
+        description: "Comi dormindo",
+        datetime: "2025-02-06T02:32:26.808Z",
+        isWithinDiet: false,
+      });
+
+    const mealId = newMeal.body.meal.id;
+
+    await request(app.server)
+      .put(`/meals/${mealId}`)
+      .set("Cookie", cookies as string[])
+      .send({
+        name: "Arroz",
+        description: "integral",
+        datetime: "2025-02-06T02:32:26.808Z",
+        isWithinDiet: true,
+      })
+      .expect(204);
+
+    const getEditedMeal = await request(app.server)
+      .get(`/meals/${mealId}`)
+      .set("Cookie", cookies as string[]);
+
+    expect(getEditedMeal.body.meal).toEqual(
+      expect.objectContaining({
+        name: "Arroz",
+        description: "integral",
+        datetime: "2025-02-06T02:32:26.808Z",
+        is_within_diet: true,
+      })
+    );
+  });
 });
